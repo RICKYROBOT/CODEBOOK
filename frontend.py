@@ -1,15 +1,31 @@
 """
 Program that uses sqlLite to store code snippets from a user.
 UI design by QT designer
-@author aspect
+@author aspect & RICKYROBOT
 """
 
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QMovie
 import SQL
 import sys
 import syntax_pars
+
+
+
+
+class HyperlinkLabel(QLabel):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.setStyleSheet('font-size: 14px; color: #FF22FF; text-decoration: none !important;')
+        self.setOpenExternalLinks(True)
+        self.setParent(parent)
+
+
+
+
+
 
 
 
@@ -53,7 +69,7 @@ class Ui_MainWindow(object):
         QLabel{
             
             color: #FFFFFF;
-            font-size:46px;
+            font-size:22px;
             font-weight: bold;
             background-color: #333333;
             #background-image: url("header.png");
@@ -63,24 +79,51 @@ class Ui_MainWindow(object):
         }
         """        
 
+        self.LogoBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.LogoBox.setGeometry(QtCore.QRect(10, 10, 80, 650))
+        self.LogoBox.setBaseSize(QtCore.QSize(0, 0))
+
+
 
         # creating a label widget
         # by default label will display at top left corner
-        #self.label = QtWidgets.QLabel(self.centralwidget)
-
-
-       
+        self.label = QtWidgets.QLabel(self.LogoBox)
+        
+               
         #self.label.setText("RIRO'S\nCODE BOOK")
-        #self.label.setText('<font color="#FFFFFF">RICKYROBOTS</font><br><font color="#6863ff" background-color="#000000" >CODE </font><font color="#dddddd">BOOK</font>')
+        self.label.setText('<font size="18" color="#FFFFFF">RICKYROBOTS</font> <br><font size="18" color="#6863ff" background-color="#000000">CODE </font><font size="18" color="#dddddd">BOOK</font>')
 
-        #self.label.setGeometry(QtCore.QRect(20, 10, 450, 70))
-       # self.label.setBaseSize(QtCore.QSize(0, 0))
+        self.label.setGeometry(QtCore.QRect(20, 10, 450, 70))
+    
 
-       # self.label.setStyleSheet(logoCSS)
+        #self.label.setStyleSheet(logoCSS)
+
+
+        self.label4 = QtWidgets.QLabel(self.LogoBox)
+
+
+        linkTemplate = '<a style="text-decoration: none" href={0}>{1}</a>'
+
+        self.label4 = HyperlinkLabel(self.LogoBox)
+        self.label4.setText(linkTemplate.format('https://github.com/RICKYROBOT/CODEBOOK', '<font color="#FFFFFF"> Open website </font>'))
+
+        #self.label4.setAutoFillBackground(True)
+        self.label4.setGeometry(QtCore.QRect(1140, -10, 200, 70))
+
+
+        self.labelGif = QtWidgets.QLabel(self.LogoBox)
+        self.labelGif.setGeometry(QtCore.QRect(0, 5, 800, 94))
+        self.gif = QtGui.QMovie('header.gif')
+        self.labelGif.setMovie(self.gif)
+        self.gif.start() 
+
+
+
+
 
 
         self.CategoriesBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.CategoriesBox.setGeometry(QtCore.QRect(10, 10, 150, 650))
+        self.CategoriesBox.setGeometry(QtCore.QRect(10, 50, 150, 650))
         self.CategoriesBox.setBaseSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         
@@ -94,7 +137,7 @@ class Ui_MainWindow(object):
 
         #CategoryListBox
         self.CatListBox = QtWidgets.QListWidget(self.CategoriesBox)
-        self.CatListBox.setGeometry(QtCore.QRect(10, 150, 150, 580))
+        self.CatListBox.setGeometry(QtCore.QRect(10, 100, 150, 530))
         self.CatListBox.setObjectName("CatListBox")
 
 
@@ -131,31 +174,31 @@ class Ui_MainWindow(object):
 
         #Catagory Edit (add) Box
         self.CatAddEdit = QtWidgets.QLineEdit(self.CategoriesBox)
-        self.CatAddEdit.setGeometry(QtCore.QRect(10, 100, 141, 20))
+        self.CatAddEdit.setGeometry(QtCore.QRect(10, 30, 141, 25))
         self.CatAddEdit.setObjectName("CatAddEdit")
 
         #Create the Add category Button, and bind AddCategory to it.
         self.CatAddBtn = QtWidgets.QPushButton(self.CategoriesBox)
-        self.CatAddBtn.setGeometry(QtCore.QRect(10, 120, 141, 23))
+        self.CatAddBtn.setGeometry(QtCore.QRect(10, 60, 141, 25))
         self.CatAddBtn.setObjectName("CatAddBtn")
         self.CatAddBtn.clicked.connect(self.AddCategory)
 
         #Remove a Category
         self.CatRemoveBtn = QtWidgets.QPushButton(self.CategoriesBox)
-        self.CatRemoveBtn.setGeometry(QtCore.QRect(10, 740, 140, 23))
+        self.CatRemoveBtn.setGeometry(QtCore.QRect(10, 640, 140, 25))
         self.CatRemoveBtn.setObjectName("CatRemoveBtn")
         self.CatRemoveBtn.clicked.connect(self.RemoveCategory)
 
        #removed
         #When user types in filter, we filter the ctegory list.
         self.CatFilterEdit = QtWidgets.QLineEdit(self.CategoriesBox)
-        self.CatFilterEdit.setGeometry(QtCore.QRect(-10, -30, 141, 20))
+        self.CatFilterEdit.setGeometry(QtCore.QRect(-10, -30, 141, 25))
         self.CatFilterEdit.setObjectName("CatFilterEdit")
         self.CatFilterEdit.textChanged.connect(self.UpdateCatList)
 
 
         self.label = QtWidgets.QLabel(self.CategoriesBox)
-        self.label.setGeometry(QtCore.QRect(-110, 30, 51, 21))
+        self.label.setGeometry(QtCore.QRect(-110, 30, 51, 25))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -167,7 +210,7 @@ class Ui_MainWindow(object):
 
 
         self.SnipetsBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.SnipetsBox.setGeometry(QtCore.QRect(180, 80, 220, 670))
+        self.SnipetsBox.setGeometry(QtCore.QRect(180, 30, 220, 670))
         font = QtGui.QFont()
         font.setBold(False)
         
@@ -201,38 +244,38 @@ class Ui_MainWindow(object):
 
         #Our Snipet List. When user clicks, we update the code window.
         self.SnipListBox = QtWidgets.QListWidget(self.SnipetsBox)
-        self.SnipListBox.setGeometry(QtCore.QRect(10, 150, 220, 580))
+        self.SnipListBox.setGeometry(QtCore.QRect(10, 100, 220, 530))
         self.SnipListBox.setObjectName("SnipListBox")
         self.SnipListBox.itemClicked.connect(self.SetCode)
         self.SnipListBox.doubleClicked.connect(self.RenameSnip)
 
 
         self.SnipAddEdit = QtWidgets.QLineEdit(self.SnipetsBox)
-        self.SnipAddEdit.setGeometry(QtCore.QRect(10, 100, 200, 20))
+        self.SnipAddEdit.setGeometry(QtCore.QRect(10, 30, 200, 25))
         self.SnipAddEdit.setObjectName("SnipAddEdit")
 
         #Button for Adding Codes to the currently selected Category(Table)
         self.SnipAddBtn = QtWidgets.QPushButton(self.SnipetsBox)
-        self.SnipAddBtn.setGeometry(QtCore.QRect(10, 120, 200, 23))
+        self.SnipAddBtn.setGeometry(QtCore.QRect(10, 60, 200, 25))
         self.SnipAddBtn.setObjectName("SnipAddBtn")
         self.SnipAddBtn.clicked.connect(self.AddSnipet)
 
         #Button for removing Snipets
         self.SnipRemoveBtn = QtWidgets.QPushButton(self.SnipetsBox)
-        self.SnipRemoveBtn.setGeometry(QtCore.QRect(10, 740, 200, 23))
+        self.SnipRemoveBtn.setGeometry(QtCore.QRect(10, 640, 200, 25))
         self.SnipRemoveBtn.setObjectName("SnipRemoveBtn")
         self.SnipRemoveBtn.clicked.connect(self.RemoveSnip)
 
        #removed
         #When user types in filter, we filter the snip list.
         self.SnipFilterEdit = QtWidgets.QLineEdit(self.SnipetsBox)
-        self.SnipFilterEdit.setGeometry(QtCore.QRect(-10, -30, 220, 20))
+        self.SnipFilterEdit.setGeometry(QtCore.QRect(-10, -30, 220, 25))
         self.SnipFilterEdit.setObjectName("SnipFilterEdit")
         self.SnipFilterEdit.textChanged.connect(self.UpdateSnipets)
 
 
         self.label_2 = QtWidgets.QLabel(self.SnipetsBox)
-        self.label_2.setGeometry(QtCore.QRect(-110, 30, 51, 21))
+        self.label_2.setGeometry(QtCore.QRect(-110, 30, 51, 25))
         font = QtGui.QFont()
         font.setPointSize(10)
         
@@ -241,7 +284,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName("label_2")
 
         self.CodeBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.CodeBox.setGeometry(QtCore.QRect(470, 50, 825, 661))
+        self.CodeBox.setGeometry(QtCore.QRect(470, 50, 800, 540))
       
 
         font = QtGui.QFont()
@@ -267,7 +310,7 @@ class Ui_MainWindow(object):
     
        
         
-        self.CodeWindow.setGeometry(QtCore.QRect(10, 30, 850, 700))
+        self.CodeWindow.setGeometry(QtCore.QRect(10, 30, 850, 600))
         # setting the minimum size
           
 
@@ -289,7 +332,7 @@ class Ui_MainWindow(object):
 
         #Code to Save Code Changes to The Currently selected Code
         self.CodeUpdateSaveBtn = QtWidgets.QPushButton(self.CodeBox)
-        self.CodeUpdateSaveBtn.setGeometry(QtCore.QRect(10, 740,  840, 23))
+        self.CodeUpdateSaveBtn.setGeometry(QtCore.QRect(10, 640,  200, 25))
         self.CodeUpdateSaveBtn.setObjectName("CodeUpdateSaveBtn")
         self.CodeUpdateSaveBtn.clicked.connect(self.UpdateCode)
 
@@ -318,11 +361,21 @@ class Ui_MainWindow(object):
         self.SnipetsBox.setMaximumWidth(220)
 
         self.CodeWindow.setMinimumWidth(400)
-        #self.CodeBox.setMaximumWidth(self.CodeBox.sizeHint());      
+        #self.CodeBox.setMaximumWidth(self.CodeBox.sizeHint());     
+         
+        self.LogoBox.setMaximumHeight(100)
 
-        self.layout.addWidget(self.CategoriesBox, 0, 0)
-        self.layout.addWidget(self.SnipetsBox, 0, 1)
-        self.layout.addWidget(self.CodeBox, 0, 2)  
+
+        
+        #full width
+        self.layout.addWidget(self.LogoBox, 0, 0, 1, 3)
+
+
+        self.layout.addWidget(self.CategoriesBox, 1, 0)
+        self.layout.addWidget(self.SnipetsBox, 1, 1)
+        self.layout.addWidget(self.CodeBox, 1, 2)  
+
+      
        
         self.centralwidget.setLayout(self.layout)
         # end
